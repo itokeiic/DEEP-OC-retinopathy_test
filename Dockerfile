@@ -1,5 +1,6 @@
 # Base image, e.g. tensorflow/tensorflow:1.7.0
-FROM tensorflow/tensorflow:1.10.1-gpu
+# FROM tensorflow/tensorflow:1.10.1-gpu
+FROM tensorflow/tensorflow:1.10.1
 
 LABEL maintainer='HMGU'
 LABEL version='0.1'
@@ -12,6 +13,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
          git \
          curl \
          wget \
+         libsm6 \
+         libxext6 \
+         libxrender1 \
          python-setuptools \
          python-pip \
          python-wheel && \ 
