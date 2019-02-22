@@ -40,7 +40,9 @@ ENV LANG C.UTF-8
 WORKDIR /srv
 
 # Install user app:
-RUN git clone -b training_branch https://github.com/itokeiic/retinopathy_test && \
+#RUN git clone -b training_branch https://github.com/itokeiic/retinopathy_test && \
+
+RUN git clone https://github.com/itokeiic/retinopathy_test && \
     cd  retinopathy_test && \
     pip install --no-cache-dir -e . && \
     rm -rf /root/.cache/pip/* && \
