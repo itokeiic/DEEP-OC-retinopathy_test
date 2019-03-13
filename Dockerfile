@@ -1,11 +1,15 @@
+ARG tag=1.10.1
+ARG pyVer=py3
+
 # Base image, e.g. tensorflow/tensorflow:1.7.0
-FROM tensorflow/tensorflow:1.10.1-gpu
-# FROM tensorflow/tensorflow:1.10.1
+FROM tensorflow/tensorflow:${tag}-${pyVer}
 
 LABEL maintainer='HMGU'
 LABEL version='0.1'
 # Retinopathy classification using Tensorflow
 
+# What user branch to clone (!)
+ARG branch=master
 
 # Install ubuntu updates and python related stuff
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
@@ -32,7 +36,7 @@ ENV LANG C.UTF-8
 WORKDIR /srv
 
 # Install user app:
-RUN git clone https://github.com/itokeiic/retinopathy_test && \
+RUN git clone -b $branch https://github.com/itokeiic/retinopathy_test && \
     cd  retinopathy_test && \
     pip install --no-cache-dir -e . && \
     rm -rf /root/.cache/pip/* && \
@@ -59,4 +63,4 @@ RUN git clone https://github.com/indigo-dc/deepaas && \
 # Open DEEPaaS port
 EXPOSE 5000
 
-CMD deepaas-run
+CMD ["sh", "-c", "deepaas-run --openwhisk-detect --listen-ip 0.0.0.0"]
