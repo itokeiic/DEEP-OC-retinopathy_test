@@ -57,7 +57,8 @@ RUN git clone https://github.com/indigo-dc/deepaas && \
     rm -rf /root/.cache/pip/* && \
     rm -rf /tmp/* && \
     cd ..
-
+# Update Werkzeug
+RUN pip install --upgrade Werkzeug
 #####
 # Your code may download necessary data automatically or 
 # you force the download during docker build. Example below is for latter case:
