@@ -59,6 +59,9 @@ RUN git clone https://github.com/indigo-dc/deepaas && \
     cd ..
 # Update Werkzeug
 RUN pip install --upgrade Werkzeug
+
+# Expand memory usage limit
+RUN ulimit -s 32768
 #####
 # Your code may download necessary data automatically or 
 # you force the download during docker build. Example below is for latter case:
