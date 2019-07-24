@@ -10,7 +10,7 @@ LABEL version='0.1'
 
 # Install ubuntu updates and python related stuff
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
-    apt-get install -y --no-install-recommends \
+    apt-get install -y --force-yes --no-install-recommends \
          git \
          curl \
          wget \
