@@ -10,7 +10,7 @@ LABEL version='0.1'
 
 # Install ubuntu updates and python related stuff
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
-    apt-get install -y --force-yes --no-install-recommends \
+    apt-get install -y --no-install-recommends \
          git \
          curl \
          wget \
@@ -43,7 +43,9 @@ WORKDIR /srv
 # Install user app:
 # RUN git clone https://github.com/itokeiic/retinopathy_test && \
 
-RUN git clone -b training_branch https://github.com/itokeiic/retinopathy_test && \
+# RUN git clone -b training_branch https://github.com/itokeiic/retinopathy_test && \
+
+RUN git clone -b subbranch_of_training_branch_for_get_test_args https://github.com/itokeiic/retinopathy_test && \
     cd  retinopathy_test && \
     pip install --no-cache-dir -e . && \
     rm -rf /root/.cache/pip/* && \
