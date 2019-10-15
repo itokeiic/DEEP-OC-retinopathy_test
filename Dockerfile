@@ -59,8 +59,12 @@ RUN git clone https://github.com/indigo-dc/deepaas && \
     rm -rf /root/.cache/pip/* && \
     rm -rf /tmp/* && \
     cd ..
+
+# Install DEEP debug_log scripts:
+RUN git clone https://github.com/deephdc/deep-debug_log /srv/.debug_log
+
 # Update Werkzeug
-RUN pip install --upgrade Werkzeug
+# RUN pip install --upgrade Werkzeug
 
 # Expand memory usage limit
 RUN ulimit -s 32768
