@@ -16,3 +16,5 @@ Quick instructions.
 
     docker run -ti -p 5000:5000 itokeiic/deep-oc-retinopathy_test
 
+Note: the docker container needs NVIDIA GPU enabled machine.
+
