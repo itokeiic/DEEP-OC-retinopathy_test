@@ -3,13 +3,13 @@
 # pyVer - python versions as 'python' or 'python3'
 # branch - user repository branch to clone (default: master, other option: test)
 
-ARG tag=1.10.0
+ARG tag=1.10.0-py3
 
 # Base image, e.g. tensorflow/tensorflow:1.10.0-py3
 FROM tensorflow/tensorflow:${tag}
 
 LABEL maintainer='HMGU'
-LABEL version='0.1'
+LABEL version='0.1.0'
 # Retinopathy classification using Tensorflow
 
 # it is python3 code
@@ -30,22 +30,13 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
          libsm6 \
          libxext6 \
          libxrender1 \
-         python-setuptools \
-         python-pip \
-         python-wheel && \ 
+         $pyVer-setuptools \
+         $pyVer-pip \
+         $pyVer-wheel && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /root/.cache/pip/* && \
-    rm -rf /tmp/*
-# install rclone
-RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.deb && \
-    dpkg -i rclone-current-linux-amd64.deb && \
-    apt install -f && \
-    rm rclone-current-linux-amd64.deb && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    rm -rf /root/.cache/pip/* && \
-    rm -rf /tmp/*
+    rm -rf /tmp/* && \
     if [ "$pyVer" = "python3" ] ; then \
        if [ ! -e /usr/bin/pip ]; then \
           ln -s /usr/bin/pip3 /usr/bin/pip; \
@@ -57,6 +48,16 @@ RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.deb && \
     python --version && \
     pip --version
 
+# install rclone
+RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.deb && \
+    dpkg -i rclone-current-linux-amd64.deb && \
+    apt install -f && \
+    mkdir /srv/.rclone/ && touch /srv/.rclone/rclone.conf && \
+    rm rclone-current-linux-amd64.deb && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /root/.cache/pip/* && \
+    rm -rf /tmp/*
 
 # Set LANG environment
 ENV LANG C.UTF-8
