@@ -11,18 +11,29 @@
 # the bash script starts a DEEP-OC container
 # and checks that the default execution is ok 
 # (defined in the CMD field of the Dockerfile)
-# by requesting get_metadata method
+# by requesting get_metadata method.
+# Also checks if various fields are present in the response.
 ###
 
+### Main configuration
+# Default Docker image, can be re-defiend
 DOCKER_IMAGE=deephdc/deep-oc-generic
-EXPECT_AUTHOR="\"HMGU\""
-EXPECT_NAME="\"retinopathy_test\""
-CONTAINER_NAME=$(date +%s)
-DEEPaaS_PORT=5000          # DEEPaaS Port inside the container
-
+META_DATA_FIELDS=("name\":" "Author\":" "License\":" "Author-email\":")
+# Container name: number of seconds since 1970 + a random number
+CONTAINER_NAME=$(date +%s)"_"$(($RANDOM))
+# DEEPaaS Port inside the container
+DEEPaaS_PORT=5000
+###
 
 ### Usage message (params can be re-defined) ###
 USAGEMESSAGE="Usage: $0 <docker_image>"
+
+# function to remove the Docker container
+function remove_container() 
+{   echo "[INFO]: Now removing ${CONTAINER_NAME} container"
+    docker stop ${CONTAINER_NAME}
+    docker rm ${CONTAINER_NAME}
+}
 
 #### Parse input ###
 arr=("$@")
@@ -41,17 +52,41 @@ else
     exit 2
 fi
 
-## try to install jq locally
-wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
-chmod +x ./jq
-
 # Start docker, let system to bind the port
 echo "[INFO] Starting Docker image ${DOCKER_IMAGE}"
+echo "[INFO] Container name: ${CONTAINER_NAME}"
 docker run --name ${CONTAINER_NAME} -p ${DEEPaaS_PORT} ${DOCKER_IMAGE} &
-sleep 20
+
+HOST_PORT=""
+port_ok=false
+max_try=5     # max number of tries to get HOST_PORT
+itry=1        # initial try number
+
+sleep 10
 # Figure out which host port was binded
-HOST_PORT=$(docker inspect -f '{{ (index (index .NetworkSettings.Ports "'"$DEEPaaS_PORT/tcp"'") 0).HostPort }}'  ${CONTAINER_NAME})
-echo "[INFO] bind port: ${HOST_PORT}"
+while [ "$port_ok" == false ] && [ $itry -lt $max_try ];
+do
+    HOST_PORT=$(docker inspect -f '{{ (index (index .NetworkSettings.Ports "'"$DEEPaaS_PORT/tcp"'") 0).HostPort }}'  ${CONTAINER_NAME})
+    # Check that HOST_PORT is a number
+    # https://stackoverflow.com/questions/806906/how-do-i-test-if-a-variable-is-a-number-in-bash
+    if [ ! -z "${HOST_PORT##*[!0-9]*}" ]; then
+        port_ok=true
+        echo "[INFO] Bind the HOST_PORT=${HOST_PORT}"
+    else
+        echo "[INFO] Did not get a right HOST_PORT (yet). Try #"$itry
+        sleep 10
+        let itry=itry+1
+    fi
+done
+
+# If could not bind a port, delete the container and exit
+if [[ $itry -ge $max_try ]]; then
+    echo "======="
+    echo "[ERROR] Did not bind a right HOST_PORT (tries = $itry). Exiting..."
+    remove_container
+    exit 3
+fi
+
 
 # Trying to access the deployment
 c_url="http://localhost:${HOST_PORT}/models/"
@@ -62,59 +97,54 @@ itry=1         # initial try number
 running=false
 
 while [ "$running" == false ] && [ $itry -lt $max_try ];
-    do
-       curl_call=$(curl -s -X GET $c_url -H "$c_args_h")
-       if (echo $curl_call | grep -q 'id\":') then
-           echo "[INFO] Service is responding (tries = $itry)"
-           running=true
-       else
-           echo "[INFO] Service is NOT (yet) responding. Try #"$itry
-           sleep 10
-           let itry=itry+1
-       fi
-    done
+do
+   curl_call=$(curl -s -X GET $c_url -H "$c_args_h")
+   if (echo $curl_call | grep -q 'id\":') then
+       echo "[INFO] Service is responding (tries = $itry)"
+       running=true
+   else
+       echo "[INFO] Service is NOT (yet) responding. Try #"$itry
+       sleep 10
+       let itry=itry+1
+   fi
+done
 
+# If could not access the deployment, delete the container and exit
 if [[ $itry -ge $max_try ]]; then
-    echo "[ERROR] DEEPaaS API does not respond (tries = $itry). Exiting"
-    exit 3
-fi
-
-# Access the running DEEPaaS API. Get models
-META_DATA=$(curl -X GET $c_url -H "$c_arg_h")
-
-# Check if Author and Name correspond to the expected values
-# Remove uncertainty on "-" or "_" signs
-EXPECT_AUTHOR=${EXPECT_AUTHOR//_/-}
-EXPECT_NAME=${EXPECT_NAME//_/-}
-
-TEST_AUTHOR=$(echo ${META_DATA} |./jq '.models[0].Author')
-TEST_NAME=$(echo ${META_DATA} |./jq '.models[0].Name')
-
-TEST_AUTHOR=${TEST_AUTHOR//_/-}
-TEST_NAME=${TEST_NAME//_/-}
-
-# remove downloaded jq
-rm ./jq
-
-if [[ "$TEST_AUTHOR" != "${EXPECT_AUTHOR}" ]]; then
-    echo "[ERROR] Author does not match! Expected: ${EXPECT_AUTHOR}. Got: $TEST_AUTHOR"
+    echo "======="
+    echo "[ERROR] DEEPaaS API does not respond (tries = $itry). Exiting..."
+    remove_container
     exit 4
 fi
-if [ "$TEST_NAME" != "${EXPECT_NAME}" ]; then
-    echo "[ERROR] Name does not match! Expected: ${EXPECT_NAME}. Got: $TEST_NAME"
-    exit 5
+
+# Access the running DEEPaaS API. Check that various fields are present
+curl_call=$(curl -s -X GET $c_url -H "$c_args_h")
+fields_ok=true
+fields_missing=()
+
+for field in ${META_DATA_FIELDS[*]}
+do
+   if (echo $curl_call | grep -iq $field) then
+       echo "[INFO] $field is present in the get_metadata() response."
+   else
+       echo "[ERROR] $field is NOT present in the get_metadata() response."
+       fields_ok=false
+       fields_missing+=($field)
+   fi
+done
+
+echo "======="
+# If some fields are missing, print them, delete the container and exit
+if [ "$fields_ok" == false ]; then
+   echo "[ERROR] The following fields are missing: (${fields_missing[*]}). Exiting..."
+   remove_container
+   exit 5
 fi
 
-echo "[SUCCESS]. Author=${TEST_AUTHOR}, Name=${TEST_NAME}. Now removing ${CONTAINER_NAME} container"
-docker stop ${CONTAINER_NAME}
-docker rm ${CONTAINER_NAME}
-echo "[INFO] Finished. Exit with the code 0 (success)"
+# if got here, all worked fine
+echo "[SUCCESS]: DEEPaaS API starts"
+echo "[SUCCESS]: Successfully checked for: (${META_DATA_FIELDS[*]})."
+remove_container
+echo "[SUCCESS] Finished. Exit with the code 0 (success)"
 exit 0
 
-### todo: the following can be removed #vykozlov
-# one other method using "docker port" command to identify the host port:
-###
-#docker_port_info=$(docker port ${CONTAINER_NAME} $DEEPaaS_PORT/tcp)
-#HOST_BIND=(${docker_port_info//:/" "})
-#HOST_PORT=${HOST_BIND[1]}
-####
