@@ -1,3 +1,4 @@
+
 # Dockerfile may have following Arguments: tag, pyVer, branch
 # tag - tag for the Base image, (e.g. 1.10.0-py3 for tensorflow)
 # pyVer - python versions as 'python' or 'python3'
@@ -11,6 +12,7 @@ FROM tensorflow/tensorflow:${tag}
 LABEL maintainer='HMGU'
 LABEL version='0.1.0'
 # Retinopathy classification using Tensorflow
+
 
 # it is python3 code
 ARG pyVer=python3
@@ -96,6 +98,7 @@ RUN if [ "$jlab" = true ]; then \
 RUN ulimit -s 32768
 
 # Install user app:
+
 # RUN git clone https://github.com/itokeiic/retinopathy_test && \
 # RUN git clone -b training_branch https://github.com/itokeiic/retinopathy_test && \
 
@@ -112,8 +115,10 @@ RUN git clone --depth 1 -b $branch https://github.com/itokeiic/retinopathy_test 
 # Open DEEPaaS port
 EXPOSE 5000
 
+
 # Open Monitoring  and Jupyter ports
 EXPOSE 6006 8888
 
 # Account for OpenWisk functionality (deepaas >=0.5.0)
 CMD ["deepaas-run", "--openwhisk-detect", "--listen-ip", "0.0.0.0", "--listen-port", "5000"]
+

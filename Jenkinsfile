@@ -9,6 +9,7 @@ pipeline {
 
     environment {
         dockerhub_repo = "deephdc/deep-oc-retinopathy_test"
+
         base_cpu_tag = "1.10.0-py3"
         base_gpu_tag = "1.10.0-gpu-py3"
     }
@@ -20,6 +21,7 @@ pipeline {
                 sh 'deep-app-schema-validator metadata.json'
             }
         }
+
         stage('Docker image building') {
             when {
                 anyOf {
@@ -31,6 +33,7 @@ pipeline {
             steps{
                 checkout scm
                 script {
+
                     // build different tags
                     id = "${env.dockerhub_repo}"
 
@@ -86,6 +89,7 @@ pipeline {
                 }
             }
             steps{
+
                 script {
                     DockerPush(id_cpu)
                     DockerPush(id_gpu)
