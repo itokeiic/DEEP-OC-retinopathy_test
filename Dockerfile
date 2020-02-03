@@ -1,3 +1,4 @@
+
 # Dockerfile may have following Arguments: tag, pyVer, branch
 # tag - tag for the Base image, (e.g. 1.10.0-py3 for tensorflow)
 # pyVer - python versions as 'python' or 'python3'
@@ -103,6 +104,7 @@ RUN ulimit -s 32768
 # RUN git clone --depth 1 -b $branch https://github.com/vykozlov/retinopathy_test && \
 
 RUN git clone --depth 1 -b $branch https://github.com/itokeiic/retinopathy_test && \
+
     cd  retinopathy_test && \
     pip install --no-cache-dir -e . && \
     rm -rf /root/.cache/pip/* && \
