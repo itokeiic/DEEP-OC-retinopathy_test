@@ -21,7 +21,7 @@ ARG pyVer=python3
 ARG branch=master
 
 # If to install JupyterLab
-ARG jlab=false
+ARG jlab=true
 
 # Install ubuntu updates and python related stuff
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
