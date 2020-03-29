@@ -4,10 +4,10 @@
 # pyVer - python versions as 'python' or 'python3'
 # branch - user repository branch to clone (default: master, other option: test)
 
-ARG tag=1.10.0-gpu-py3.6
+ARG tag=1.12.0-py36
 
 # Base image, e.g. tensorflow/tensorflow:1.10.0-py3
-FROM tensorflow/tensorflow:${tag}
+FROM deephdc/tensorflow:${tag}
 
 LABEL maintainer='HMGU'
 LABEL version='0.1.0'
