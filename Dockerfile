@@ -18,10 +18,13 @@ LABEL version='0.1.0'
 ARG pyVer=python3
 
 # What user branch to clone (!)
-ARG branch=master
+ARG branch=using_onedata
 
 # If to install JupyterLab
 ARG jlab=true
+
+# Oneclient version
+ARG oneclient_ver=19.02.0.rc2-1~bionic
 
 # Install ubuntu updates and python related stuff
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
@@ -51,16 +54,34 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     pip install --upgrade pip && \
     pip --version
 
-# install rclone
-RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.deb && \
-    dpkg -i rclone-current-linux-amd64.deb && \
-    apt install -f && \
-    mkdir /srv/.rclone/ && touch /srv/.rclone/rclone.conf && \
-    rm rclone-current-linux-amd64.deb && \
+# # install rclone
+# RUN wget https://downloads.rclone.org/rclone-current-linux-amd64.deb && \
+#     dpkg -i rclone-current-linux-amd64.deb && \
+#     apt install -f && \
+#     mkdir /srv/.rclone/ && touch /srv/.rclone/rclone.conf && \
+#     rm rclone-current-linux-amd64.deb && \
+#     apt-get clean && \
+#     rm -rf /var/lib/apt/lists/* && \
+#     rm -rf /root/.cache/pip/* && \
+#     rm -rf /tmp/*
+
+# # onedata installation
+# RUN apt-get update && apt-get install -y gnupg2 \
+#     curl http://packages.onedata.org/onedata.gpg.key | apt-key add -  \
+#     echo "deb [arch=amd64] http://packages.onedata.org/apt/ubuntu/1902 \
+#     bionic main" > /etc/apt/sources.list.d/onedata.list \
+#     echo "deb-src [arch=amd64] http://packages.onedata.org/apt/ubuntu/1902 \
+#     bionic main" >> /etc/apt/sources.list.d/onedata.list
+# 
+# RUN apt-get update && apt-get install -y oneclient=19.02.0.rc2-1~bionic
+
+# INSTALL oneclient for ONEDATA
+RUN curl -sS  http://get.onedata.org/oneclient-1902.sh | bash -s -- oneclient="$oneclient_ver" && \
     apt-get clean && \
+    mkdir -p /mnt/onedata && \
     rm -rf /var/lib/apt/lists/* && \
-    rm -rf /root/.cache/pip/* && \
     rm -rf /tmp/*
+
 
 # Set LANG environment
 ENV LANG C.UTF-8
