@@ -31,7 +31,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
          libsm6 \
          libxext6 \
          libxrender1 \
-         python-dev \
+         gcc python3-dev \
          $pyVer-setuptools \
          $pyVer-pip \
          $pyVer-wheel && \
