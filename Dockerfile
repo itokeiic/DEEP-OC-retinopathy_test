@@ -132,8 +132,8 @@ RUN if [ "$jlab" = true ]; then \
        pip install --no-cache-dir jupyterlab ; \
     else echo "[INFO] Skip JupyterLab installation!"; fi
 
-# Expand memory usage limit
-RUN ulimit -s 32768
+# # Expand memory usage limit
+# RUN ulimit -s 32768
 
 # Install user app:
 
