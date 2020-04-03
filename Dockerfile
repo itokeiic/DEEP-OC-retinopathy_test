@@ -24,7 +24,8 @@ ARG branch=using_onedata
 ARG jlab=true
 
 # Oneclient version
-ARG oneclient_ver=19.02.0.rc2-1~bionic
+#ARG oneclient_ver=19.02.0.rc2-1~bionic
+ARG oneclient_ver=19.02.0.rc2-1~xenial
 
 # Install ubuntu updates and python related stuff
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
@@ -82,6 +83,12 @@ RUN curl -sS  http://get.onedata.org/oneclient-1902.sh | bash -s -- oneclient="$
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /tmp/*
 
+# RUN curl -sS  http://get.onedata.org/oneclient-1902.sh | bash && \
+#     apt-get clean && \
+#     mkdir -p /mnt/onedata && \
+#     rm -rf /var/lib/apt/lists/* && \
+#     rm -rf /tmp/* 
+
 # EXPERIMENTAL: install deep-start script
 # N.B.: This repository also contains run_jupyter.sh
 # For compatibility, create symlink /srv/.jupyter/run_jupyter.sh
@@ -115,10 +122,14 @@ RUN git clone https://github.com/deephdc/deep-debug_log /srv/.debug_log
 ENV JUPYTER_CONFIG_DIR /srv/.jupyter/
 # Necessary for the Jupyter Lab terminal
 ENV SHELL /bin/bash
+# RUN if [ "$jlab" = true ]; then \
+#        pip install --no-cache-dir jupyterlab ; \
+#        git clone https://github.com/deephdc/deep-jupyter /srv/.jupyter ; \       
+#     else echo "[INFO] Skip JupyterLab installation!"; fi
+
+# not installing dee-jupyter because it is in deep-start
 RUN if [ "$jlab" = true ]; then \
        pip install --no-cache-dir jupyterlab ; \
-       #git clone https://github.com/deephdc/deep-jupyter /srv/.jupyter ; \
-       
     else echo "[INFO] Skip JupyterLab installation!"; fi
 
 # Expand memory usage limit
