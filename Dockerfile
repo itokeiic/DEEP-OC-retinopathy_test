@@ -53,6 +53,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     fi && \
     python --version && \
     pip install --upgrade pip && \
+    pip install werkzeug==0.15.1 && \
     pip --version
 
 # install rclone
@@ -120,6 +121,8 @@ RUN git clone https://github.com/deephdc/deep-debug_log /srv/.debug_log
 
 # Install JupyterLab
 ENV JUPYTER_CONFIG_DIR /srv/.deep-start/
+#ENV JUPYTER_CONFIG_DIR /srv/.jupyter/
+
 # Necessary for the Jupyter Lab terminal
 ENV SHELL /bin/bash
 # RUN if [ "$jlab" = true ]; then \
