@@ -92,7 +92,7 @@ RUN if [ "$jlab" = true ]; then \
     else echo "[INFO] Skip JupyterLab installation!"; fi
 
 # Expand memory usage limit
-RUN ulimit -s 32768
+# RUN ulimit -s 32768
 
 # Install user app:
 # RUN git clone https://github.com/itokeiic/retinopathy_test && \
