@@ -4,10 +4,10 @@
 # pyVer - python versions as 'python' or 'python3'
 # branch - user repository branch to clone (default: master, other option: test)
 
-ARG tag=1.10.0-gpu-py3
+ARG tag=1.12.0-gpu-py36
 
 # Base image, e.g. tensorflow/tensorflow:1.10.0-py3
-FROM tensorflow/tensorflow:${tag}
+FROM deephdc/tensorflow:${tag}
 
 LABEL maintainer='HMGU'
 LABEL version='0.1.0'
@@ -32,6 +32,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
          libsm6 \
          libxext6 \
          libxrender1 \
+         gcc python3-dev \
          $pyVer-setuptools \
          $pyVer-pip \
          $pyVer-wheel && \
@@ -71,7 +72,7 @@ WORKDIR /srv
 # Install DEEPaaS from PyPi
 # Install FLAAT (FLAsk support for handling Access Tokens)
 RUN pip install --no-cache-dir \
-        'deepaas==0.5.1' \
+        'deepaas>=1.0.0' \
         flaat && \
     rm -rf /root/.cache/pip/* && \
     rm -rf /tmp/*
@@ -92,7 +93,7 @@ RUN if [ "$jlab" = true ]; then \
     else echo "[INFO] Skip JupyterLab installation!"; fi
 
 # Expand memory usage limit
-RUN ulimit -s 32768
+# RUN ulimit -s 32768
 
 # Install user app:
 
@@ -102,7 +103,7 @@ RUN ulimit -s 32768
 # clone only the last commit from github
 # RUN git clone --depth 1 -b $branch https://github.com/vykozlov/retinopathy_test && \
 
-RUN git clone --depth 1 -b $branch https://github.com/itokeiic/retinopathy_test && \
+RUN git clone --depth 1 -b $branch https://github.com/deephdc/retinopathy_test && \
     cd  retinopathy_test && \
     pip install --no-cache-dir -e . && \
     rm -rf /root/.cache/pip/* && \
