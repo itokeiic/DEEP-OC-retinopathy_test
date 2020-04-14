@@ -20,6 +20,7 @@ pipeline {
                 sh 'deep-app-schema-validator metadata.json'
             }
         }
+
         stage('Docker image building') {
             when {
                 anyOf {
@@ -31,6 +32,7 @@ pipeline {
             steps{
                 checkout scm
                 script {
+
                     // build different tags
                     id = "${env.dockerhub_repo}"
 
@@ -86,6 +88,7 @@ pipeline {
                 }
             }
             steps{
+
                 script {
                     DockerPush(id_cpu)
                     DockerPush(id_gpu)
