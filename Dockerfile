@@ -18,7 +18,7 @@ LABEL version='0.1.0'
 ARG pyVer=python3
 
 # What user branch to clone (!)
-ARG branch=test
+ARG branch=multi_tfrecord
 
 # If to install JupyterLab
 ARG jlab=true
