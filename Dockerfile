@@ -82,7 +82,7 @@ WORKDIR /srv
 # Install DEEPaaS from PyPi
 # Install FLAAT (FLAsk support for handling Access Tokens)
 RUN pip install --no-cache-dir \
-        'deepaas>=0.5.0' \
+        'deepaas>=1.3.0' \
         flaat && \
     rm -rf /root/.cache/pip/* && \
     rm -rf /tmp/*
@@ -108,11 +108,8 @@ RUN if [ "$jlab" = true ]; then \
 RUN ulimit -s 32768
 
 # Install user app:
-# RUN git clone https://github.com/itokeiic/retinopathy_test && \
-# RUN git clone -b training_branch https://github.com/itokeiic/retinopathy_test && \
-
 # clone only the last commit from github
-RUN git clone --depth 1 -b $branch https://github.com/vykozlov/retinopathy_test && \
+RUN git clone --depth 1 -b $branch https://github.com/deephdc/retinopathy_test && \
     cd  retinopathy_test && \
     pip install --no-cache-dir -e . && \
     rm -rf /root/.cache/pip/* && \
