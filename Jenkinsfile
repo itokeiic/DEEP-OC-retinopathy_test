@@ -8,7 +8,7 @@ pipeline {
     }
 
     environment {
-        dockerhub_repo = "deephdc/deep-oc-retinopathy_test"
+        dockerhub_repo = "itokeiic/deep-oc-retinopathy_test"
         base_cpu_tag = "1.12.0-py36"
         base_gpu_tag = "1.12.0-gpu-py36"
     }
