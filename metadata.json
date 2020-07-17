@@ -9,7 +9,7 @@
     "cite_url": "https://gitlab.com/niklaskoehler/retinopathy_model",
     "date_creation": "2018-10-02",
     "sources": {
-		"dockerfile_repo": "https://github.com/deephdc/DEEP-OC-retinopathy_test",
+		"dockerfile_repo": "https://github.com/itokeiic/DEEP-OC-retinopathy_test",
 		"docker_registry_repo": "itokeiic/deep-oc-retinopathy_test",
 		"code": "https://github.com/itokeiic/retinopathy_test"
 	},
